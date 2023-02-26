@@ -7,6 +7,13 @@ export class TableBuilder implements ITableBuilder, ITable {
   private _indexName: StringOrNull
   private _version: number = 1
 
+  constructor() {
+    this._database = null
+    this._tableName = null
+    this._primaryField = null
+    this._indexName = null
+  }
+
   public withDatabase(databaseName: string): ITableBuilder {
     this._database = databaseName
     return this

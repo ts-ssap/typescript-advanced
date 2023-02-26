@@ -7,7 +7,7 @@ import { IPersonState, IRecordState, RecordState } from '../state'
 import { PersonRecord } from '../types'
 import { FormValidation } from '../validation/FormValidation'
 
-const defaultPerson: Readonly<IPersonState> = {
+const initialState: Readonly<IPersonState> = {
   firstName: '',
   lastName: '',
   address1: '',
@@ -25,7 +25,7 @@ const dataLayer: Database<PersonRecord> = new Database(tableBuilder.build())
 
 const PersonalDetails = () => {
   const [people, setPeople] = useState<PersonRecord[]>([])
-  const [person, setPerson] = useState(defaultPerson)
+  const [person, setPerson] = useState(initialState)
   const [canSave, setCanSave] = useState(false)
 
   const updateBinding = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,25 +40,10 @@ const PersonalDetails = () => {
     })
   }
 
-  const setActive: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+  const editPerson: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     const personId = event.currentTarget.value
     const activePerson = people.find((p) => p.personId === personId)
     if (activePerson) setPerson(activePerson)
-  }
-
-  const deletePerson: React.MouseEventHandler<HTMLButtonElement> = (event) => {
-    const personId = event.currentTarget.value
-    const foundPerson = people.find((p) => p.personId === personId)
-
-    if (!foundPerson) return
-
-    const personState = new RecordState()
-    const state: PersonRecord = { ...foundPerson, ...personState }
-    dataLayer.update(state).then(loadPeople)
-
-    if (person.personId === personId) {
-      clear()
-    }
   }
 
   const savePerson = () => {
@@ -81,8 +66,23 @@ const PersonalDetails = () => {
     }
   }
 
+  const deletePerson: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+    const personId = event.currentTarget.value
+    const foundPerson = people.find((p) => p.personId === personId)
+
+    if (!foundPerson) return
+
+    const personState = new RecordState()
+    const state: PersonRecord = { ...foundPerson, ...personState }
+    dataLayer.update(state).then(loadPeople)
+
+    if (person.personId === personId) {
+      clear()
+    }
+  }
+
   const clear = () => {
-    setPerson(defaultPerson)
+    setPerson(initialState)
   }
 
   return (
@@ -277,7 +277,11 @@ const PersonalDetails = () => {
                     <label>{`${p.firstName} ${p.lastName}`}</label>
                   </Col>
                   <Col lg="3">
-                    <Button value={p.personId} color="link" onClick={setActive}>
+                    <Button
+                      value={p.personId}
+                      color="link"
+                      onClick={editPerson}
+                    >
                       Edit
                     </Button>
                   </Col>
