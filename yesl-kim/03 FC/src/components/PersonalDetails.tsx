@@ -55,7 +55,10 @@ const PersonalDetails = () => {
     const personState = new RecordState()
     const state: PersonRecord = { ...foundPerson, ...personState }
     dataLayer.update(state).then(loadPeople)
-    clear()
+
+    if (person.personId === personId) {
+      clear()
+    }
   }
 
   const savePerson = () => {
