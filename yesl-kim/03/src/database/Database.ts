@@ -74,19 +74,28 @@ export class Database<T extends RecordState> {
   public read(): Promise<T[]> {
     return new Promise((resolve) => {
       const dbStore = this.getObjectStore()
+      console.log('store: ', dbStore)
+
       const items: T[] = []
       const request = dbStore!.openCursor()
+      console.log('request: ', request)
+
       // 데이터베이스 접근하는 게 비동기 통신이 아니라
       // 이벤트 핸들러로 처리된다는 게 생소함
       request.onsuccess = (e: any) => {
         const cursor: IDBCursorWithValue = e.target.result
         if (cursor) {
-          const result = cursor.value
+          console.log('cursor: ', cursor.value)
+
+          const result: T = cursor.value
           if (result.isActive) {
+            console.log('push item: ', result)
             items.push(result)
           }
-          cursor.continue
+          cursor.continue()
         } else {
+          console.log('success: ', items)
+
           resolve(items)
         }
       }

@@ -34,6 +34,9 @@ interface FormValidationProps {
 export class FormValidation extends React.Component<FormValidationProps> {
   private failures: string[]
   private validations: Validation[]
+  // ref vs 전역변수 :
+  // 개별 컨포넌트가 모두 다른 인스턴스를 가져야할 경우 ref,
+  // 모든 컴포넌트에서 공통된 인스턴스를 참조할 경우 전역에서 할당하는 것이 좋음 (like 싱글톤)
 
   constructor(props: FormValidationProps) {
     super(props)
@@ -51,6 +54,7 @@ export class FormValidation extends React.Component<FormValidationProps> {
       validation.validate(this.props.currentstate, this.failures)
     })
 
+    console.log('can save: ', this.failures.length > 0)
     this.props.canSave(this.failures.length > 0)
   }
 

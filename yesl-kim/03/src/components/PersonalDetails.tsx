@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Col, Row } from 'reactstrap'
 import { Database } from '../database/Database'
 import { PersonalDetailsTableBuilder } from '../database/PersonalDetailsTableBuilder'
 import { TableBuilder } from '../database/TableBuilder'
-import { IPersonState, RecordState } from '../state'
+import { IPersonState, IRecordState, RecordState } from '../state'
 import { PersonRecord } from '../types'
 import { FormValidation } from '../validation/FormValidation'
 
@@ -22,10 +22,10 @@ const defaultPerson: Readonly<IPersonState> = {
 
 interface Props {}
 
+const tableBuilder = new PersonalDetailsTableBuilder()
+const dataLayer: Database<PersonRecord> = new Database(tableBuilder.build())
+
 const PersonalDetails = () => {
-  const tableBuilder = new PersonalDetailsTableBuilder()
-  const dataLayer: Database<PersonRecord> = new Database(tableBuilder.build())
-  // let people: IPersonState[] = []
   const [people, setPeople] = useState<PersonRecord[]>([])
   const [person, setPerson] = useState(defaultPerson)
 
@@ -34,28 +34,61 @@ const PersonalDetails = () => {
   }
 
   const [canSave, setCanSave] = useState(false)
-  const userCanSave = (hasErrors: boolean) => setCanSave(hasErrors)
+  const userCanSave = (hasErrors: boolean) => setCanSave(!hasErrors)
 
   const loadPeople = () => {
     dataLayer.read().then((peopleFromDB: PersonRecord[]) => {
+      console.log('people 조회: ', peopleFromDB)
       setPeople(peopleFromDB)
     })
   }
 
-  const setActive = (personId: string) => {
-    const _person = people.find((p) => p.personId === personId)
-    if (_person) setPerson(_person)
+  const setActive: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+    const personId = event.currentTarget.value
+    const activePerson = people.find((p) => p.personId === personId)
+    if (activePerson) setPerson(activePerson)
   }
 
-  // TODO: 2023.02.24 ~ 여기부터 시작!
-  const deletePerson = (personId: string) => {
-    const _person = people.find((p) => p.personId)
-    const state = new RecordState()
-    const personState = { ..._person, ...state }
-    dataLayer.update(personState)
-    loadPeople()
-    // clear()
+  const deletePerson: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+    const personId = event.currentTarget.value
+    const foundPerson = people.find((p) => p.personId === personId)
+
+    if (!foundPerson) return
+
+    const personState = new RecordState()
+    const state: PersonRecord = { ...foundPerson, ...personState }
+    dataLayer.update(state).then(loadPeople)
+    clear()
   }
+
+  const savePerson = () => {
+    if (!canSave) {
+      alert('Cannot save this record with missing or incorrect items')
+      return
+    }
+
+    const personState = new RecordState(true)
+    const state: PersonRecord = { ...person, ...personState }
+
+    if (state.personId === '') {
+      // person 새로 생성
+      const personId = Date.now().toString()
+      dataLayer.create({ ...state, personId })
+      loadPeople()
+      clear()
+    } else {
+      // 업데이트
+      dataLayer.update(state).then(loadPeople)
+    }
+  }
+
+  const clear = () => {
+    setPerson(defaultPerson)
+  }
+
+  useEffect(() => {
+    console.log('people: ', people)
+  }, [people])
 
   return (
     <Row>
@@ -225,7 +258,7 @@ const PersonalDetails = () => {
         </Row>
         <Row>
           <Col>
-            <Button size="lg" color="primary">
+            <Button size="lg" color="primary" onClick={savePerson}>
               Save
             </Button>
           </Col>
@@ -236,7 +269,7 @@ const PersonalDetails = () => {
           </Col>
         </Row>
         <Row>
-          <FormValidation currentstate={person} canSave={setCanSave} />
+          <FormValidation currentstate={person} canSave={userCanSave} />
         </Row>
       </Col>
       <Col>
@@ -249,11 +282,7 @@ const PersonalDetails = () => {
                     <label>{`${p.firstName} ${p.lastName}`}</label>
                   </Col>
                   <Col lg="3">
-                    <Button
-                      value={p.personId}
-                      color="link"
-                      onClick={() => setActive(p.personId)}
-                    >
+                    <Button value={p.personId} color="link" onClick={setActive}>
                       Edit
                     </Button>
                   </Col>
@@ -261,7 +290,7 @@ const PersonalDetails = () => {
                     <Button
                       value={p.personId}
                       color="link"
-                      // onClick={delete}
+                      onClick={deletePerson}
                     >
                       Delete
                     </Button>
@@ -272,7 +301,7 @@ const PersonalDetails = () => {
           </Row>
           <Row>
             <Col lg="6">
-              <Button size="lg" color="success">
+              <Button size="lg" color="success" onClick={loadPeople}>
                 Load
               </Button>
             </Col>
