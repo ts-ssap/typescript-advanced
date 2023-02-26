@@ -31,7 +31,8 @@ export const FormValidation = ({
   const validate = () => {
     const _failures: string[] = []
     validations.forEach((validation) => {
-      validation.validate(currentstate, _failures)
+      const error = validation.validate(currentstate)
+      if (error) _failures.push(error)
     })
 
     canSave(_failures.length > 0)

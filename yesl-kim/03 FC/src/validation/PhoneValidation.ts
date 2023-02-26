@@ -9,11 +9,11 @@ export class PhoneValidation implements Validation {
   )
   private readonly minLengthValidator = new MinLengthValidator(1)
 
-  public validate(state: IPersonState, errors: string[]): void {
+  public validate(state: IPersonState): string | undefined {
     if (!this.minLengthValidator.isValid(state.phoneNumber)) {
-      errors.push('You must enter a phone number')
+      return 'You must enter a phone number'
     } else if (!this.regExpValidator.isValid(state.phoneNumber)) {
-      errors.push('The phone number format is invalid')
+      return 'The phone number format is invalid'
     }
   }
 }

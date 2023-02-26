@@ -70,8 +70,7 @@ const PersonalDetails = () => {
     if (state.personId === '') {
       // person 새로 생성
       const personId = Date.now().toString()
-      dataLayer.create({ ...state, personId })
-      loadPeople()
+      dataLayer.create({ ...state, personId }).then(loadPeople)
       clear()
     } else {
       // 업데이트
@@ -256,7 +255,7 @@ const PersonalDetails = () => {
             </Button>
           </Col>
           <Col>
-            <Button size="lg" color="secondary">
+            <Button size="lg" color="secondary" onClick={clear}>
               Clear
             </Button>
           </Col>
@@ -299,7 +298,7 @@ const PersonalDetails = () => {
               </Button>
             </Col>
             <Col lg="6">
-              <Button size="lg" color="info">
+              <Button size="lg" color="info" onClick={clear}>
                 New Person
               </Button>
             </Col>

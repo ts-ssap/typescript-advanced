@@ -7,7 +7,7 @@ export interface Validator<T> {
 }
 
 export interface Validation {
-  validate: (state: IPersonState, errors: string[]) => void
+  validate: (state: IPersonState) => string | undefined
 }
 
 // 테이블 생성

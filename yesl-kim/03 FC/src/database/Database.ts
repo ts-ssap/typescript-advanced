@@ -44,9 +44,15 @@ export class Database<T extends RecordState> {
     }
   }
 
-  public create(state: T): void {
-    const dbStore = this.getObjectStore()
-    dbStore!.add(state)
+  public create(state: T): Promise<void> {
+    return new Promise((resolve) => {
+      const dbStore = this.getObjectStore()
+      const request = dbStore!.add(state)
+
+      request.onsuccess = (e: any) => {
+        resolve()
+      }
+    })
     // TODO: dbStore?.put(state) 이 둘의 차이는?
   }
 
