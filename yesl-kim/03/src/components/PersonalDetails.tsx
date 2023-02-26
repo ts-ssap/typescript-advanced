@@ -38,7 +38,6 @@ const PersonalDetails = () => {
 
   const loadPeople = () => {
     dataLayer.read().then((peopleFromDB: PersonRecord[]) => {
-      console.log('people 조회: ', peopleFromDB)
       setPeople(peopleFromDB)
     })
   }
@@ -85,10 +84,6 @@ const PersonalDetails = () => {
   const clear = () => {
     setPerson(defaultPerson)
   }
-
-  useEffect(() => {
-    console.log('people: ', people)
-  }, [people])
 
   return (
     <Row>
