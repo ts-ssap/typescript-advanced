@@ -76,16 +76,17 @@ export class Database<T extends RecordState> {
       const dbStore = this.getObjectStore()
       const items: T[] = []
       const request = dbStore!.openCursor()
+
       // 데이터베이스 접근하는 게 비동기 통신이 아니라
       // 이벤트 핸들러로 처리된다는 게 생소함
       request.onsuccess = (e: any) => {
         const cursor: IDBCursorWithValue = e.target.result
         if (cursor) {
-          const result = cursor.value
+          const result: T = cursor.value
           if (result.isActive) {
             items.push(result)
           }
-          cursor.continue
+          cursor.continue()
         } else {
           resolve(items)
         }

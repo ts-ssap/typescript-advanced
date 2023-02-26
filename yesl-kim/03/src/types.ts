@@ -28,4 +28,4 @@ export interface ITable {
   build(database: IDBDatabase): void
 }
 
-export type PersonRecord = RecordState & IPersonState
+export type PersonRecord = IRecordState & IPersonState

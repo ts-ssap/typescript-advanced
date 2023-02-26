@@ -5,7 +5,7 @@ import { RegularExpressionValidator } from '../validators/RegularExpressionValid
 
 export class PhoneValidation implements Validation {
   private readonly regExpValidator = new RegularExpressionValidator(
-    'A(?:\\((?:[0-9]{3})\\)|(?:[0-9]{3}))[-.]?(?:[0-9]{3})[-. ]?(?:[0-9]{4})$'
+    '^(?:((?:[0-9]{3}))|(?:[0-9]{3}))[-.]?(?:[0-9]{4})[-.]?(?:[0-9]{4})$'
   )
   private readonly minLengthValidator = new MinLengthValidator(1)
 
